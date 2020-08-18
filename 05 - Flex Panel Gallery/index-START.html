@@ -24,11 +24,16 @@
     }
 
     .panels {
+      display: flex;
       min-height: 100vh;
       overflow: hidden;
     }
 
     .panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
       background: #6B0F9C;
       box-shadow: inset 0 0 0 5px rgba(255,255,255,0.1);
       color: white;
@@ -63,14 +68,33 @@
       font-family: 'Amatic SC', cursive;
       text-shadow: 0 0 4px rgba(0, 0, 0, 0.72), 0 0 14px rgba(0, 0, 0, 0.45);
       font-size: 2em;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel p:first-child {
+      transform: translateY(-100%);
     }
     
     .panel p:nth-child(2) {
       font-size: 4em;
+      transform: translateY(0);
+    }
+
+    .panel p:last-child {
+      transform: translateY(100%);
     }
 
     .panel.open {
       font-size: 40px;
+      flex: 5
+    }
+
+    .panel.active p {
+      visibility: visible;
+      transform: translateY(0);
     }
 
   </style>
@@ -105,6 +129,28 @@
   </div>
 
   <script>
+
+    const handlePanelClick = () => {
+      panel.classList.toggle('open')
+    }
+
+    const handleTransitionEnd = (event) => {
+      if (['flex', 'flex-grow'].includes(event.propertyName)) {
+        panel.classList.toggle('active')
+      }
+    }
+
+    const panels = document.querySelectorAll('.panel')
+
+    panels.forEach(panel => {
+
+      // toggle open class on click
+      panel.addEventListener('click', () => handlePanelClick)
+
+      // Add the active class after the first transform is done
+      panel.addEventListener('transitionend', handleTransitionEnd)
+
+    })
 
   </script>
 
