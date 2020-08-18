@@ -26,6 +26,12 @@
       misc styles, nothing to do with CSS variables
     */
 
+    :root {
+      --base: #bada55;
+      --blur: 10px;
+      --spacing: 5px;
+    }
+
     body {
       text-align: center;
       background: #193549;
@@ -42,9 +48,34 @@
     input {
       width: 100px;
     }
+
+    img {
+      padding: var(--spacing);
+      background-color: var(--base);
+      filter: blur(var(--blur));
+    }
+
+    .hl {
+      color: var(--base);
+    }
   </style>
 
   <script>
+
+    const body = document.querySelector('body')
+    const inputs = document.querySelectorAll('.controls input')
+
+    const setProperty = ({target}) => {
+      const unit = target.dataset.sizing || ''
+      body.style.setProperty(`--${target.getAttribute('id')}`, target.value + unit)
+    }
+
+    inputs.forEach(input => {
+      setProperty({target: input}) // call this initially so the values & inputs match
+      input.addEventListener('change', setProperty)
+    })
+
+
   </script>
 
 </body>
