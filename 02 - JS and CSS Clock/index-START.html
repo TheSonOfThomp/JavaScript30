@@ -15,6 +15,38 @@
       </div>
     </div>
 
+    
+    <script>
+      var started = false; // flags whether the clock is started
+      const secondHand = document.querySelector('.second-hand')
+      const minuteHand = document.querySelector('.min-hand')
+      const hourHand = document.querySelector('.hour-hand')
+
+      setInterval(() => {
+        // Set the custom property. Do the calc in the CSS
+        const now = new Date()
+
+        const secondsDeg = now.getSeconds() * (360 / 60)
+        const minsDeg = now.getMinutes() * (360 / 60)
+        const hoursDeg = now.getHours() * (360 / 12)
+
+        checkAnimating(secondsDeg, secondHand)
+        checkAnimating(minsDeg, minuteHand)
+        checkAnimating(hoursDeg, hourHand)
+
+        secondHand.style.setProperty('--hand-degrees', secondsDeg)
+        minuteHand.style.setProperty('--hand-degrees', minsDeg)
+        hourHand.style.setProperty('--hand-degrees', hoursDeg)
+        started = true
+      }, 1000);
+
+      const checkAnimating = (value, element) => {
+        // don't animate if we haven't started the clock, or if the value is passing by 0
+        if(value === 0 || !started) { element.classList.remove('animating') }
+        else element.classList.add('animating')
+      }
+    </script>
+
 
   <style>
     html {
@@ -23,6 +55,7 @@
       font-family: 'helvetica neue';
       text-align: center;
       font-size: 10px;
+      --hand-start-time: 45;
     }
 
     body {
@@ -57,11 +90,30 @@
     }
 
     .hand {
+      --hand-scale: 1;
+      --hand-value-degrees: 0;
       width: 50%;
       height: 6px;
       background: black;
+      border-radius: 3px;
       position: absolute;
       top: 50%;
+      transform: 
+        rotate(calc( var(--hand-degrees)*1deg + 90deg)) 
+        scaleX(var(--hand-scale));
+      transform-origin: 100%;
+    }
+
+    .hand.animating {
+      transition: transform cubic-bezier(0.14, 3.33, 0.46, 0.04) 0.1s;
+    }
+
+    .min-hand {
+      --hand-scale: 0.95;
+    }
+
+    .hour-hand {
+      --hand-scale: 0.75;
     }
 
   </style>
