@@ -14,8 +14,134 @@
       <li>or a state</li>
     </ul>
   </form>
+
+<style>
+  .suggestion.hidden {
+    display: none;
+  }
+</style>
+
 <script>
+
+// utilities 
+
+const findMatches = (value, places) => places.filter(place => doesItemMatch(value, place))
+
+const doesItemMatch = (value, place) => {
+  const regex = new RegExp(value, 'gi')
+  return place.city.match(regex) || place.state.match(regex)
+}
+
+const getEvenOdd = (index) => index % 2 ? 'odd' : 'even'
+
+const getID = (place) => `${place.city.replace(' ', '-').toLowerCase()}-${place.state.replace(' ', '-').toLowerCase()}`
+
+// Get the data
 const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+const suggestionsElem = document.querySelector('.suggestions')
+let allListItems; // to store a NodeList of results
+
+const cities = []
+fetch(endpoint).then(resp => resp.json()).then(data => {
+  cities.push(...data)
+  insertHTML(cities) // uncomment when using filterHTML in event handler
+})
+
+
+// Generates html based on the places passed in and an optional search value
+const generateHTML = (places, searchVal = null) => {
+  if (!places.length) {
+    return `<li>No results found</li>`
+  }
+
+  return places.map((place, index) => {
+    const cityName = place.city.replace(searchVal, `<em>${searchVal}</em>`)
+    const stateName = place.state.replace(searchVal, `<em>${searchVal}</em>`)
+
+    return `
+    <li class="suggestion ${getEvenOdd(index)}" data-index="${index}" data-key="${getID(place)}" data-city="${place.city}" data-state="${place.state}">
+      <span class="name">${cityName}, ${stateName}</span>
+      <span class="population">${place.population}</span>
+    </li>`
+  }).join('')
+}
+
+// injects html into the suggestions element. Captures the NodeList
+const insertHTML = (places, searchVal = null) => {
+  const html = generateHTML(places, searchVal)
+  suggestionsElem.innerHTML = html
+  allListItems = suggestionsElem.querySelectorAll('.suggestion')
+}
+
+// Hide or show DOM elements based on values passed in
+const filterHTML = (places, searchVal) => {
+  allListItems.forEach((item) => {
+    if(doesItemMatch(searchVal, item.dataset)) {
+      item.classList.remove('hidden')
+
+      const placeElem = item.querySelector('.name')
+      const regex = new RegExp(searchVal, 'gi')
+      const cityName = searchVal ? item.dataset.city.replace(regex, `<em>${searchVal}</em>`) : item.dataset.city
+      const stateName = searchVal ? item.dataset.state.replace(regex, `<em>${searchVal}</em>`) : item.dataset.state
+      placeElem.innerHTML = `${cityName}, ${stateName}`
+    } else {
+      item.classList.add('hidden')
+    }
+  })
+}
+
+const reactiveHTML = (allPlaces, searchVal) => {
+  allPlaces.forEach((place, index) => {
+      const elem = suggestionsElem.querySelector(`[data-key="${getID(place)}"]`)
+    if (doesItemMatch(searchVal, place)) {
+      // make sure element exists
+      if (!elem) {
+        // if not, add it at the appropriate index
+        const next = suggestionsElem.querySelector(`[data-index="${index+1}"]`)
+        const template = document.createElement('div')
+        
+        template.innerHTML = `
+        <li class="suggestion ${getEvenOdd(index)}" data-index="${index}" data-key="${getID(place)}" data-city="${place.city}" data-state="${place.state}">
+          <span class="name">${place.city}, ${place.state}</span>
+          <span class="population">${place.population}</span>
+        </li>`
+        const newNode = template.firstElementChild
+        suggestionsElem.appendChild(newNode)
+      }
+    } else {
+      if(elem) {
+        // remove the element from the DOM
+        suggestionsElem.removeChild(elem)
+      }
+    }
+  })
+}
+
+
+const handleSearch = (e) => {
+  const searchVal = e.target.value
+  const matches = findMatches(searchVal, cities)
+
+  console.time('updateHTML')
+
+  // Option 1 - insert new HTML
+  // even though fully replacing html takes longer to render, 
+  // it's faster overall since the filter script takes longer
+  insertHTML(matches, searchVal)
+
+  // Option 2 - filter the existing nodes and add a hidden class
+  // this is slow to script and breaks the result highlighting
+  // filterHTML(matches, searchVal) 
+
+  // Option 3 - reactive insert/delete
+  // keep a list of all possible nodes. Inject or remove them as needed
+  // reactiveHTML(cities, searchVal)
+
+  console.timeEnd('updateHTML')
+}
+
+const searchBox = document.querySelector('.search')
+searchBox.addEventListener('keyup', handleSearch)
 
 </script>
 </body>
