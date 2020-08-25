@@ -7,6 +7,50 @@
 <body>
 <canvas id="draw" width="800" height="800"></canvas>
 <script>
+
+  const canvas = document.querySelector('canvas')
+  const ctx = canvas.getContext('2d')
+
+  canvas.width = window.innerWidth
+  canvas.height = window.innerHeight
+
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 10;
+  // ctx.globalCompositeOperation = 'lighten'
+  const [minWidth, maxWidth] = [5, 25]
+  let isDrawing = false;
+  let [lastX, lastY, lastDelta] = [0, 0, 0]
+  let hue = 0;
+
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing) return
+    const delta = Math.sqrt(((e.offsetX - lastX) * (e.offsetX - lastX)) + ((e.offsetY - lastY) + (e.offsetY - lastY))) || 1
+    const acceleration = (delta - lastDelta) === 0 ? 0 : Math.pow(-1, (delta - lastDelta))
+
+    console.log(ctx.lineWidth)
+    ctx.beginPath();
+    
+    ctx.lineWidth = Math.min(Math.max(ctx.lineWidth - acceleration, minWidth), maxWidth)
+
+    ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+    ctx.moveTo(lastX, lastY)
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    [lastX, lastY, lastDelta] = [e.offsetX, e.offsetY, delta]
+    hue++
+    hue = hue%360
+  })
+
+  canvas.addEventListener('mousedown', (e) => {
+    [lastX, lastY] = [e.offsetX, e.offsetY]
+    ctx.lineWidth = 10;
+    isDrawing = true
+  })
+
+  canvas.addEventListener('mouseup', () => isDrawing = false)
+  canvas.addEventListener('mouseout', () => isDrawing = false)
+
 </script>
 
 <style>
