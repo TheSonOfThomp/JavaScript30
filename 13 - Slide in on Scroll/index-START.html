@@ -58,6 +58,18 @@
       };
     }
 
+  const _THRESHOLD = 0.25
+  const sliderImages = document.querySelectorAll('.slide-in');
+
+  sliderImages.forEach(image => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      if(entries.every(entry => entry.intersectionRatio >= _THRESHOLD)) {
+        image.classList.add('active')
+      }
+    }, {threshold: _THRESHOLD})
+    observer.observe(image)
+  })
+
   </script>
 
   <style>
