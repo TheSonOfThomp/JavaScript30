@@ -96,6 +96,49 @@
   </div>
 
 <script>
+
+// get all checkboxes
+const checkboxes = document.querySelectorAll('input[type="checkbox"]')
+
+// add change event listeners to all of them
+checkboxes.forEach(checkbox => checkbox.addEventListener('change', handleCheckboxChange))  
+
+// add a keydown & keyup listener to the document
+let isShiftDown = false;
+document.addEventListener('keydown', toggleShift)
+document.addEventListener('keyup', toggleShift)
+
+function toggleShift(e) {
+  if (e.key === "Shift") isShiftDown = (e.type === 'keydown')
+}
+
+let lastChecked;
+function handleCheckboxChange(e) {
+  const value = e.target.value;
+  // console.log(e.shiftKey) // no shift key attr in change event
+
+  // if there is a keydown, set all other checkboxes to checked
+  if (isShiftDown && value && lastChecked) {
+    const index = Array.from(e.target.parentNode.children).indexOf(e.target)
+
+    // loop thru all boxes, check the ones between
+    let shouldCheck = false
+    checkboxes.forEach(box => {
+      if (box === e.target || box === lastChecked) {
+        shouldCheck = !shouldCheck
+      }
+
+      if (shouldCheck) {
+        box.checked = true
+      }
+    })
+
+    // alt — store index of e.target & lastChecked in html as data- attributes
+    // or get element's index in the parent
+  }
+  // store the last checked box (in case we need it)
+  lastChecked = e.target
+}
 </script>
 </body>
 </html>
