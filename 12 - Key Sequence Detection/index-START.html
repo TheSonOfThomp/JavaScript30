@@ -7,6 +7,26 @@
 </head>
 <body>
 <script>
+const logged = [];
+const code = [
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'a',
+  'b',
+  'Enter'
+]
+
+document.addEventListener('keyup', (e) => {
+  logged.push(e.key)
+  logged.splice(- code.length - 1, logged.length - code.length)
+  if(logged.length === code.length && logged.every((x,i) => code[i] === x)) {
+    cornify_add();
+  }
+})
 </script>
 </body>
 </html>
