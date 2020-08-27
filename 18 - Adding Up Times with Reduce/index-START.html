@@ -182,6 +182,21 @@
     </li>
   </ul>
 <script>
+
+  const items = [...document.querySelectorAll('li')]
+
+  let seconds = items.reduce((total, el) => {
+    const time = el.dataset.time
+    const [minutes, seconds] = time.split(':')
+    return total + parseInt(seconds) + (parseInt(minutes) * 60);
+  }, 0)
+
+  const hours = Math.floor(seconds / (60*60))
+  seconds = seconds % (60*60)
+  const mins = Math.floor(seconds / 60)
+  seconds = seconds % 60
+  console.log(`${hours}:${mins}:${seconds}`)
+
 </script>
 </body>
 </html>
