@@ -29,12 +29,33 @@
   }
 
   h1 {
-    text-shadow: 10px 10px 0 rgba(0,0,0,1);
+    text-shadow: 
+      var(--shadow-distance, 10px 10px) 
+      var(--shadow-blur, 0px) 
+      var(--shadow-color, rgba(0,0,0,1));
     font-size: 100px;
   }
   </style>
 
 <script>
+
+  const hero = document.querySelector('.hero')
+  hero.addEventListener('mousemove', updateShadow)
+
+  function updateShadow(e) {
+    const { offsetHeight: height,  offsetWidth: width } = e.target
+    const { offsetX: x,  offsetY: y } = e
+
+    const dx = (width / 2 - x)/10
+    const dy = (height / 2 - y)/10
+    const dist = Math.sqrt(dx*dx + dy*dy)
+    const alpha = Math.min(1, 10/dist)
+
+    hero.style.setProperty('--shadow-distance', `${dx}px ${dy}px`)
+    hero.style.setProperty('--shadow-blur', `${dist}px`)
+    hero.style.setProperty('--shadow-color', `rgba(0,0,0,${alpha})`)
+  }
+
 </script>
 </body>
 </html>
