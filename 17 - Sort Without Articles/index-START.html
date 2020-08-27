@@ -47,7 +47,13 @@
 
 <script>
 const bands = ['The Plot in You', 'The Devil Wears Prada', 'Pierce the Veil', 'Norma Jean', 'The Bled', 'Say Anything', 'The Midway State', 'We Came as Romans', 'Counterparts', 'Oh, Sleeper', 'A Skylit Drive', 'Anywhere But Here', 'An Old Dog'];
+const articles = /^(the )|^(an )|^(a )/i
 
+const removeArticles = (s) => s.replace(articles, '').trim().toLocaleLowerCase()
+bands.sort((a, z) => removeArticles(a) > removeArticles(z) ? 1 : -1)
+
+const bandsList = document.querySelector('#bands')
+bandsList.innerHTML = bands.map(band => `<li>${band}</li>`).join('')
 
 </script>
 
