@@ -40,8 +40,8 @@
     .arrow {
       width: 250px;
       overflow: hidden;
-      transition: all 0.2s;
-      transform: rotate(0deg);
+      transition: all 1s;
+      transform: rotate(var(--heading, 0deg));
       display: inline-block;
     }
 
@@ -59,6 +59,15 @@
     /*Compass: https://thenounproject.com/search/?q=compass&i=592352*/
   </style>
   <script>
+
+    const arrowEl = document.querySelector('.arrow')
+    const speedEl = document.querySelector('.speed-value')
+
+    navigator.geolocation.watchPosition((data) => {
+      speedEl.textContent = data.coords.speed || 0
+      arrowEl.style.setProperty('--heading', `${data.coords.heading || 0}deg`)
+    }, err => console.error(err))
+
   </script>
 </body>
 </html>
