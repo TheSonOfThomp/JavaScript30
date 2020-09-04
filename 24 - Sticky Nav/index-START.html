@@ -54,6 +54,18 @@
   </div>
 
 <script>
+  const nav = document.querySelector('nav#main')
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.intersectionRatio < 1) {
+        document.body.classList.add('fixed-nav')
+      } else {
+        document.body.classList.remove('fixed-nav')
+      }
+    })
+  }, {threshold: [0, 0.99, 1]})
+  observer.observe(nav)
+
 
 </script>
 
