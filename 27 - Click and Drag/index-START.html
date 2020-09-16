@@ -35,6 +35,69 @@
   </div>
 
 <script>
+
+const DAMPING = 2
+const FRAME_TIME = 16 / 1000
+const slider = document.querySelector('.items')
+let isDown = false;
+let startX = 0, scrollLeft = 0, dx = 0;
+let startTime, velocity, initialVelocity;
+
+slider.addEventListener('mousedown', (e) => {
+  isDown = true
+  slider.classList.add('active')
+  startX = e.pageX - slider.offsetLeft
+  scrollLeft = slider.scrollLeft
+  stopSliding()
+})
+
+slider.addEventListener('mouseleave', stopDragging)
+
+slider.addEventListener('mouseup', stopDragging)
+
+slider.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault()
+  dx = e.movementX // the distance the mouse moved
+  slider.scrollLeft = slider.scrollLeft - dx
+})
+
+
+function inertialSlide(currentTime) {
+  if (startTime === undefined) {
+    startTime = currentTime
+    initialVelocity = dx / FRAME_TIME // dx / dt
+  }
+
+  const t_sec = (currentTime - startTime)/1000
+  velocity = initialVelocity * Math.exp(-DAMPING * t_sec)
+  dx = Math.round(velocity * FRAME_TIME)
+
+  console.log({dx})
+
+
+  if (dx !== 0) {
+    slider.scrollLeft = slider.scrollLeft - dx
+    requestAnimationFrame(inertialSlide)
+  } else {
+    stopSliding()
+  }
+}
+
+function stopSliding() {
+  startTime = undefined
+  velocity = 0
+  initialVelocity = 0
+  dx = 0
+}
+
+function stopDragging(){
+  isDown = false
+  slider.classList.remove('active')
+  requestAnimationFrame(inertialSlide)
+}
+
+
 </script>
 
   </body>
