@@ -15,6 +15,33 @@
   </div>
 
 <script>
+
+  const speed = document.querySelector('.speed')
+  const speedBar = document.querySelector('.speed-bar')
+  const video = document.querySelector('video')
+
+  let isDragging = false;
+
+  const HEIGHT = speed.offsetHeight;
+  const MIN_RATE = 0.4;
+  const MAX_RATE = 4;
+
+  speed.addEventListener('mousedown', () => {isDragging = true})
+  speed.addEventListener('mouseup', () => {isDragging = false})
+  speed.addEventListener('mouseleave', () => {isDragging = false})
+
+  speed.addEventListener('mousemove', function(e) { // need a regular function so we can access `this`
+    if(!isDragging) return
+    const y = e.pageY - this.offsetTop;
+    const percent = y / this.offsetHeight;
+    const min = 0.4;
+    const max = 4;
+    const height = Math.round(percent * 100) + '%';
+    const playbackRate = percent * (max - min) + min;
+    speedBar.style.height = height;
+    speedBar.textContent = playbackRate.toFixed(2) + '×';
+    video.playbackRate = playbackRate;
+  })
 </script>
 </body>
 </html>
