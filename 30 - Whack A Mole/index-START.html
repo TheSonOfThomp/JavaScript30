@@ -33,9 +33,54 @@
   </div>
 
 <script>
-  const holes = document.querySelectorAll('.hole');
-  const scoreBoard = document.querySelector('.score');
-  const moles = document.querySelectorAll('.mole');
+
+const holes = document.querySelectorAll('.hole');
+const scoreBoard = document.querySelector('.score');
+const moles = document.querySelectorAll('.mole');
+let lastHoleIdx;
+let gamePlaying = true;
+let score = 0;
+
+const randTime = (min, max) => Math.random() * (max - min) + min
+const randHole = (holes) => {
+  const idx = Math.floor(Math.random() * holes.length)
+  const hole = holes[idx]
+  if (idx === lastHoleIdx) randHole(holes)
+  lastHoleIdx = idx
+  return hole
+}
+
+function startPeeping() {
+  const time = randTime(200, 1200)
+  const hole = randHole(holes)
+  hole.classList.add('up')
+
+  setTimeout(() => {
+    hole.classList.remove('up')
+    if(gamePlaying) startPeeping()
+  }, time);
+}
+
+function startGame(params) {
+  scoreBoard.textContent = 0;
+  gamePlaying = true;
+  score = 0;
+
+  startPeeping()
+
+  setTimeout(() => {
+    gamePlaying = false
+  }, 10000);
+}
+
+function bonk(e){
+  console.log('boink')
+  if (!e.isTrusted || !e.target.parentNode.classList.contains('up')) return
+  scoreBoard.textContent = ++score
+  e.target.parentNode.classList.remove('up')
+}
+
+moles.forEach(mole => mole.addEventListener('click', bonk))
 
 </script>
 </body>
